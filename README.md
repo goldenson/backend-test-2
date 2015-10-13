@@ -1,6 +1,6 @@
 # [Aircall.io](https://aircall.io) - Backend technical test
 
-This test is a part of our hiring process at Aircall for [backend positions](https://aircall.io/jobs#BackendDeveloper).
+This test is a part of our hiring process at Aircall for [backend positions](https://aircall.io/jobs#BackendDeveloper). It should take you between 3 and 6 hours depending on your experience.
 
 __Feel free to apply! Drop us a line with your Linkedin/Github/Twitter/AnySocialProfileWhereYouAreActive at jobs@aircall.io__
 
