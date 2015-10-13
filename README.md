@@ -57,6 +57,10 @@ The use case we want to reproduce is the following:
 - If nobody took the call on a specific line, the caller will leave a voicemail.
 - The call has to be logged in the database.
 
+### Submission
+
+Fork this repository and send us a pull request. We'll review it and get back to you in order to talk about your code!
+
 ## Main steps
 
 [ ] Create a Plivo account and read the doc.
