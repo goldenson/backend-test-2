@@ -54,7 +54,7 @@ The use case we want to reproduce is the following:
 - A customer is calling one of the number of the company.
 - The call has to be redirected to the apps of the users. 
 - If nobody took the call on a specific line, the caller will leave a voicemail.
-- The call has to be logged in the database (with a reference to the user who answered or an URL to the voicemail).
+- The call has to be logged in the database (with a reference to the number, to the user who answered or an URL to the voicemail).
 
 ### Submission
 
