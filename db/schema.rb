@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150922194944) do
+ActiveRecord::Schema.define(version: 20160126112740) do
+
+  create_table "calls", force: :cascade do |t|
+    t.string   "url_voicemail"
+    t.string   "number_from"
+    t.string   "number_to"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
 
   create_table "company_numbers", force: :cascade do |t|
     t.string   "sip_endpoint"

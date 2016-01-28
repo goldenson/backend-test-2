@@ -1,0 +1,10 @@
+<h2>Total of calls : <%= @calls.size %></h2>
+
+<% @calls.each do |call| %>
+  <ul>
+    <li># <%= call.id %></li>
+    <li>FROM : <%= call.number_from if call.number_from %></li>
+    <li>TO : <%= call.number_to if call.number_to %></li>
+    <li>VOICEMAIL : <%= link_to "#{call.url_voicemail}", call.url_voicemail if call.url_voicemail %></li>
+ </ul>
+<% end %>
