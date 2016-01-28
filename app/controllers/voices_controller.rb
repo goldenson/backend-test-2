@@ -1,12 +1,12 @@
 include Plivo
 
 class VoicesController < ApplicationController
-  # Very important
+  # Very important, avoid CSRF protection by Twilio
   skip_before_action :verify_authenticity_token
 
   def receive
     @r = Response.new()
-    @r.addSpeak('Hello, you just received your first call')
+    @r.addSpeak('Hello, we are connect')
     puts @r.to_xml()
 
     # Render XML element to talk wit Plivo API
@@ -18,7 +18,7 @@ class VoicesController < ApplicationController
     from_number = params[:From]
     @r = Response.new()
     d = @r.addDial({'callerId' => from_number,
-                    'action' => 'http://f396f33c.ngrok.io/plivo_answer',
+                    'action' => 'http://501e2cc7.ngrok.io/plivo_answer',
                     'method' => 'POST',
                     'redirect' => 'true'})
 
@@ -30,8 +30,6 @@ class VoicesController < ApplicationController
 
     puts @r.to_xml()
 
-    #Call.new(url_voicemail: 'efwevfw', number_from: from_number, number_to: forwarding_mobile_app).save
-
     # Render XML element to talk wit Plivo API
     render xml: @r.to_s, content_type: 'application/xml'
   end
@@ -39,18 +37,17 @@ class VoicesController < ApplicationController
   def save_call
     to = params['DialBLegTo']
     from = params['From']
-    # Let a message here
     if !to
       @r = Response.new()
       @r.addSpeak('Please leave a message after the beep')
-      @r.addRecord({'action' => 'http://f396f33c.ngrok.io/get_recording',
-                    'maxLength' => '30'})
+      @r.addRecord({'action' => 'http://501e2cc7.ngrok.io/get_recording',
+                    'maxLength' => '30',
+                    'sip_headers' => 'Test=Sample'})
       puts @r.to_xml()
 
       render xml: @r.to_s, content_type: 'application/xml'
     else
-      c = Call.new(number_from: from, number_to: to)
-      c.save
+      Call.create(number_from: from, number_to: to)
       render nothing: true
     end
   end
@@ -59,10 +56,16 @@ class VoicesController < ApplicationController
     url_voicemail = params['RecordUrl']
     from = params['From']
     to = params['DialBLegTo']
-    c = Call.new(url_voicemail: url_voicemail, number_from: from, number_to: to)
-    c.save
-
+    Call.create(url_voicemail: url_voicemail, number_from: from, number_to: to)
     render nothing: true
+  end
+
+  def hangup
+    render nothing: true
+  end
+
+  def calls
+    @calls = Call.all
   end
 
 end
