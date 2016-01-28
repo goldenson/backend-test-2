@@ -10,46 +10,79 @@
 
 #[X] Create SIP endpoints on Plivo for the caller and the users' apps.
 
-#[] Create Application and SIP endpoints you'll use for company's numbers.
+#[X] Create Application and SIP endpoints you'll use for company's numbers.
 
 #[X] Create a Call model in order to store call history and voicemails.
 
 #[X] Redirect incoming calls to users' apps by interacting with Plivo.
 
-company_lines = ['Mainoffice2', 'Salesnumber2', 'SupportNumber2']
-
-def create_endpoints(params_array, user_id)
+class PlivoAPI
   include Plivo
-  p = RestAPI.new('MAMDE0NWVKM2ZKYJA5ZT', 'OTI2ODg4MzAwYjBmMDdhN2ZmMzhiNzg0NTIyMmQx')
 
-  params_array.each do |line|
+  def initialize
+    @AUTH_ID = ENV['AUTH_ID']
+    @AUTH_TOKEN = ENV['AUTH_TOKEN']
+    @plivo = RestAPI.new(@AUTH_ID, @AUTH_TOKEN)
+  end
+
+  def create_endpoint_app(app_name, user_id)
+    params = {
+      'username' => app_name, # The username for the endpoint to be created
+      'password' => 'qwertyuiop', # The password for your endpoint username
+      'alias' => app_name # Alias for this endpoint
+    }
+    response = @plivo.create_endpoint(params)
+    puts response
+    UserNumber.create(user_id: user_id, sip_endpoint: response[1]['username'] + '@phone.plivo.com')
+  end
+
+
+  def create_endpoint_line(line)
     params = {
       'username' => line, # The username for the endpoint to be created
       'password' => 'qwertyuiop', # The password for your endpoint username
       'alias' => line # Alias for this endpoint
     }
-    response = p.create_endpoint(params)
-    return if params_array == ['Max']
-    if user_id != 0
-      UserNumber.create(user_id: user_id, sip_endpoint: response[1]['username'] + '@phone.plivo.com')
-    else
-      CompanyNumber.create(sip_endpoint: response[1]['username'] + '@phone.plivo.com')
-    end
-    print response
+    response = @plivo.create_endpoint(params)
+    puts response
+    return if line == 'Max'
+    CompanyNumber.create(sip_endpoint: response[1]['username'] + '@phone.plivo.com')
+  end
+
+  def create_application
+    params = {
+      # The URL Plivo will fetch when a call executes this application
+      'answer_url' => 'http://501e2cc7.ngrok.io/forward',
+      'answer_method' => 'GET',
+      'hangup_url' => 'http://501e2cc7.ngrok.io/hangup',
+      'hangup_method' => 'GET',
+      'app_name' => 'Forward test Application', # The name of your application
+      'default_endpoint_app' => true # The name of your application
+    }
+     Create a new application
+    response = @plivo.create_application(params)
+    puts response
   end
 end
 
 
+company_lines = ['Mainoffice2', 'Salesnumber2', 'SupportNumber2']
 users = ['Jane', 'Peter', 'Luke']
 user_apps = ['Mobile', 'Tablet', 'Desktop']
 
-#users.each do |user|
-  #user = User.create(name: user)
-  #create_endpoints(user_apps, user.id)
-#end
+plivo = PlivoAPI.new
 
-#create_endpoints(company_lines, 0)
+plivo.create_application
 
+users.each do |user|
+  user = User.create(name: user)
+  user_apps.each do |app|
+    plivo.create_endpoint_app(app, user.id)
+  end
+end
 
-caller_user = ['Max']
-create_endpoints(caller_user, 0)
+company_lines.each do |line|
+  plivo.create_endpoint_line(line)
+end
+
+plivo.create_endpoint_line('Max')
