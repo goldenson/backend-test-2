@@ -41,8 +41,7 @@ class VoicesController < ApplicationController
       @r = Response.new()
       @r.addSpeak('Please leave a message after the beep')
       @r.addRecord({'action' => 'https://aircall.herokuapp.com/get_recording',
-                    'maxLength' => '30',
-                    'sip_headers' => 'Test=Sample'})
+                    'maxLength' => '30'})
       puts @r.to_xml()
 
       render xml: @r.to_s, content_type: 'application/xml'
