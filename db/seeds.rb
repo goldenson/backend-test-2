@@ -52,9 +52,9 @@ class PlivoAPI
   def create_application
     params = {
       # The URL Plivo will fetch when a call executes this application
-      'answer_url' => 'http://501e2cc7.ngrok.io/forward',
+      'answer_url' => 'https://aircall.herokuapp.com/forward',
       'answer_method' => 'GET',
-      'hangup_url' => 'http://501e2cc7.ngrok.io/hangup',
+      'hangup_url' => 'https://aircall.herokuapp.com/hangup',
       'hangup_method' => 'GET',
       'app_name' => 'Forward test Application', # The name of your application
       'default_endpoint_app' => true # The name of your application

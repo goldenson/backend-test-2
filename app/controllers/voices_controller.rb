@@ -18,7 +18,7 @@ class VoicesController < ApplicationController
     from_number = params[:From]
     @r = Response.new()
     d = @r.addDial({'callerId' => from_number,
-                    'action' => 'http://501e2cc7.ngrok.io/plivo_answer',
+                    'action' => 'https://aircall.herokuapp.com/plivo_answer',
                     'method' => 'POST',
                     'redirect' => 'true'})
 
@@ -40,7 +40,7 @@ class VoicesController < ApplicationController
     if !to
       @r = Response.new()
       @r.addSpeak('Please leave a message after the beep')
-      @r.addRecord({'action' => 'http://501e2cc7.ngrok.io/get_recording',
+      @r.addRecord({'action' => 'https://aircall.herokuapp.com/get_recording',
                     'maxLength' => '30',
                     'sip_headers' => 'Test=Sample'})
       puts @r.to_xml()
