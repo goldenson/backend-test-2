@@ -59,7 +59,6 @@ class PlivoAPI
       'app_name' => 'Forward test Application', # The name of your application
       'default_endpoint_app' => true # The name of your application
     }
-     Create a new application
     response = @plivo.create_application(params)
     puts response
   end
