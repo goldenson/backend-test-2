@@ -1,56 +1,52 @@
 include Plivo
 
 class VoicesController < ApplicationController
-  # Very important, avoid CSRF protection by Twilio
+  # Very important, avoid CSRF protection
+  # https://www.twilio.com/blog/2014/02/twilio-on-rails-integrating-twilio-with-your-rails-4-app.html
   skip_before_action :verify_authenticity_token
 
+  # GET http://lvh.me:3000/receive
   def receive
-    @r = Response.new()
-    @r.addSpeak('Hello, we are connect')
-    puts @r.to_xml()
-
-    # Render XML element to talk wit Plivo API
-    render xml: @r.to_s, content_type: 'application/xml'
+    @xml_response = Response.new()
+    @xml_response.addSpeak('Hello, we are connected')
+    render_plivo_xml(@xml_response)
   end
 
-  # http://lvh.me:3000/forward
+  # GET http://lvh.me:3000/forward
   def forward
     from_number = params[:From]
-    @r = Response.new()
-    d = @r.addDial({'callerId' => from_number,
-                    'action' => 'https://aircall.herokuapp.com/plivo_answer',
+    @xml_response = Response.new()
+    dial = @xml_response.addDial({'callerId' => from_number,
+                    'action' => 'https://aircall.herokuapp.com/save_call',
                     'method' => 'POST',
                     'redirect' => 'true'})
 
-    # Call all the app of each user
+    # Call all the apps of each user
     UserNumber.all.each do |sip_app|
       forwarding_app = sip_app.sip_endpoint
-      d.addUser(forwarding_app)
+      dial.addUser('sip:' + forwarding_app)
     end
 
-    puts @r.to_xml()
-
-    # Render XML element to talk wit Plivo API
-    render xml: @r.to_s, content_type: 'application/xml'
+    render_plivo_xml(@xml_response)
   end
 
+  # POST http://lvh.me:3000/save_call
   def save_call
     to = params['DialBLegTo']
     from = params['From']
     if !to
-      @r = Response.new()
-      @r.addSpeak('Please leave a message after the beep')
-      @r.addRecord({'action' => 'https://aircall.herokuapp.com/get_recording',
-                    'maxLength' => '30'})
-      puts @r.to_xml()
-
-      render xml: @r.to_s, content_type: 'application/xml'
+      @xml_response = Response.new()
+      @xml_response.addSpeak('Please leave a message after the beep')
+      @xml_response.addRecord({'action' => 'https://aircall.herokuapp.com/get_recording',
+                               'maxLength' => '30'})
+      render_plivo_xml(@xml_response)
     else
       Call.create(number_from: from, number_to: to)
       render nothing: true
     end
   end
 
+  # POST http://lvh.me:3000/get_recording
   def get_recording
     url_voicemail = params['RecordUrl']
     from = params['From']
@@ -59,12 +55,22 @@ class VoicesController < ApplicationController
     render nothing: true
   end
 
+  # GET http://lvh.me:3000/hangup
   def hangup
     render nothing: true
   end
 
+  # GET
   def calls
     @calls = Call.all
+  end
+
+  private
+
+  # Render XML element to talk wit Plivo API
+  def render_plivo_xml(xml)
+    puts xml.to_xml()
+    render xml: xml.to_s, content_type: 'application/xml'
   end
 
 end
