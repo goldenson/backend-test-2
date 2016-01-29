@@ -61,7 +61,7 @@ class VoicesController < ApplicationController
   end
 
   # GET
-  def calls
+  def index
     @calls = Call.all
   end
 

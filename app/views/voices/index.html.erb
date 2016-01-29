@@ -4,7 +4,9 @@
   <ul>
     <li># <%= call.id %></li>
     <li>FROM : <%= call.number_from if call.number_from %></li>
-    <li>TO : <%= call.number_to if call.number_to %></li>
+    <% if call.number_to %>
+      <li>TO : <%= call.number_to %></li>
+    <% end %>
     <% if call.url_voicemail %>
       <li>VOICEMAIL : <%= link_to "#{call.url_voicemail}", call.url_voicemail %></li>
     <% end %>
